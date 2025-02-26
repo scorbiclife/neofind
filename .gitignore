@@ -13,5 +13,9 @@ _deps
 CMakeUserPresets.json
 
 # neofind
-/lib/
+/build
+/lib
 /neofind
+/conwaylife_inference_test*
+/generate_conwaylife_inference_test
+
