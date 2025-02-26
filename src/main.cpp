@@ -8,34 +8,48 @@
 using Cell = uint16_t;
 
 /**
- * The possible populations of the following bottom three neighbors.
- *  xx xx xx
- *  xx    xx
- *  sw sc se
+ * A data structure that can contain a set of populations of
+ * at most three neighbors.
  *
- * If the population could be zero at a specific phase,
- * `(std::get<0>(populations) >> phase) & 0x1` should be on.
- * Same for the other possible values.
+ * We use this, for example, to save the possible populations
+ * of the southmost three neighbors.
  */
-using TripletPopulationSet = std::tuple<Cell, Cell, Cell, Cell>;
+class PopSet {
+private:
+    Cell canHavePop0;
+    Cell canHavePop1;
+    Cell canHavePop2;
+    Cell canHavePop3;
+public:
+    PopSet(int period __attribute__((unused)), Cell pop0, Cell pop1, Cell pop2, Cell pop3) {
+        canHavePop0 = pop0;
+        canHavePop1 = pop1;
+        canHavePop2 = pop2;
+        canHavePop3 = pop3;
+    }
+
+    std::tuple<Cell, Cell, Cell, Cell> destructure() {
+        return std::make_tuple(canHavePop0, canHavePop1, canHavePop2, canHavePop3);
+    }
+};
 
 /**
  * Given the a cell (cc) and its top and middle five neighbors,
  * calculate the possible populations of the bottom three neighbors.
  */
 using InferenceFunction =
-    std::function<TripletPopulationSet (
+    std::function<PopSet (
+            int period,
             Cell nw, Cell nc, Cell ne,
-            Cell cw, Cell cc, Cell ce,
-            int period)>;
+            Cell cw, Cell cc, Cell ce)>;
 
 /**
  * Inference function for conway's game of life.
  */
-inline TripletPopulationSet inferConwaylife(
+inline PopSet inferConwaylife(
+        int period,
         Cell nw, Cell nc, Cell ne,
-        Cell cw, Cell cc, Cell ce,
-        int period) {
+        Cell cw, Cell cc, Cell ce) {
     // First, get the population of the following five neighbors:
     //   nw nc ne
     //   cw    ce
@@ -76,7 +90,7 @@ inline TripletPopulationSet inferConwaylife(
     Cell canHavePopOne = ((s4 | ~(s1 ^ s2) | (s1 & ~cc)) ^ nextPhase) & periodMask;
     Cell canHavePopTwo = ((s4 | s2 | (~s1 & ~cc)) ^ nextPhase) & periodMask;
     Cell canHavePopThree = ((s4 | s2 | s1) ^ nextPhase) & periodMask;
-    return std::make_tuple(canHavePopZero, canHavePopOne, canHavePopTwo, canHavePopThree);
+    return PopSet(canHavePopZero, canHavePopOne, canHavePopTwo, canHavePopThree, period);
 }
 
 /**
@@ -99,7 +113,8 @@ void debugConwaylifeInference() {
     for (int cw = 0; cw < 2; ++cw)
     for (int cc = 0; cc < 4; ++cc) // for the center cell, also consider the next state
     for (int ce = 0; ce < 2; ++ce) {
-        auto [pop0, pop1, pop2, pop3] = conwaylife(nw, nc, ne, cw, cc, ce, 2);
+        auto popSet = conwaylife(2, nw, nc, ne, cw, cc, ce);
+        auto [pop0, pop1, pop2, pop3] = popSet.destructure();
         std::cout
             << nw << nc << ne << '\n'
             << cw << cc << ce << '\n'
@@ -108,7 +123,6 @@ void debugConwaylifeInference() {
 }
 
 int main() {
+    debugConwaylifeInference();
     return 0;
 }
-
-
