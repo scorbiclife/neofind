@@ -24,5 +24,12 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-add_executable(neofind "" src/main.cpp)
+enable_testing()
 
+add_executable(generate_conwaylife_inference_test src/GenerateConwaylifeInferenceFunctionTest.cpp)
+
+add_executable(conwaylife_inference_test src/ConwaylifeInferenceFunctionTest.cpp)
+target_link_libraries(conwaylife_inference_test GTest::gtest_main)
+
+include(GoogleTest)
+gtest_discover_tests(conwaylife_inference_test)
