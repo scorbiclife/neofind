@@ -50,7 +50,7 @@ inline PopSet inferConwaylife(
     Cell canHavePopOne = ((s4 | ~(s1 ^ s2) | (s1 & ~cc)) ^ nextPhase) & periodMask;
     Cell canHavePopTwo = ((s4 | s2 | (~s1 & ~cc)) ^ nextPhase) & periodMask;
     Cell canHavePopThree = ((s4 | s2 | s1) ^ nextPhase) & periodMask;
-    return PopSet(canHavePopZero, canHavePopOne, canHavePopTwo, canHavePopThree, period);
+    return PopSet(period, canHavePopZero, canHavePopOne, canHavePopTwo, canHavePopThree);
 }
 
 #endif
